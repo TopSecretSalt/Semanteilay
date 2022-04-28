@@ -37,7 +37,7 @@ const addRoomToLists = (user: User, room: Room) => {
   allRooms.set(room.roomId, new Set([user]));
 }
 
-export function init(server: http.Server) {
+const init = (server: http.Server) => {
   const io = new Server(server, {
     cors: {
       origin: "*", //allowing cors from anywhere
@@ -76,3 +76,5 @@ export function init(server: http.Server) {
 
   return getAllRooms;
 }
+
+export default init;

@@ -1,66 +1,58 @@
-"use strict";
-exports.__esModule = true;
-exports.init = void 0;
-var socket_io_1 = require("socket.io");
-var allRooms = new Map();
-var userRooms = new Map();
-var removeUserFromLists = function (_a) {
-    var id = _a.id;
+import { Server } from "socket.io";
+const allRooms = new Map();
+const userRooms = new Map();
+const removeUserFromLists = ({ id }) => {
     removeUserFromAllRooms(id);
-    userRooms["delete"](id);
+    userRooms.delete(id);
 };
-var removeUserFromAllRooms = function (userId) {
+const removeUserFromAllRooms = (userId) => {
     var _a;
-    (_a = userRooms.get(userId)) === null || _a === void 0 ? void 0 : _a.forEach(function (room) {
+    (_a = userRooms.get(userId)) === null || _a === void 0 ? void 0 : _a.forEach(room => {
         var _a;
-        var participants = (_a = allRooms.get(room.roomId)) === null || _a === void 0 ? void 0 : _a.values();
+        const participants = (_a = allRooms.get(room.roomId)) === null || _a === void 0 ? void 0 : _a.values();
         if (participants) {
-            var filteredParticipants = new Set(Array.from(participants).filter(function (participant) { return participant.id !== userId; }));
+            const filteredParticipants = new Set(Array.from(participants).filter(participant => participant.id !== userId));
             allRooms.set(room.roomId, filteredParticipants);
         }
     });
 };
-var addRoomToLists = function (user, room) {
+const addRoomToLists = (user, room) => {
     var _a;
-    var oldRooms = (_a = userRooms.get(user.id)) !== null && _a !== void 0 ? _a : new Set();
-    var newRooms = oldRooms.add(room);
+    const oldRooms = (_a = userRooms.get(user.id)) !== null && _a !== void 0 ? _a : new Set();
+    const newRooms = oldRooms.add(room);
     userRooms.set(user.id, newRooms);
     allRooms.set(room.roomId, new Set([user]));
 };
-function init(server) {
-    var io = new socket_io_1.Server(server, {
+const init = (server) => {
+    const io = new Server(server, {
         cors: {
-            origin: "*"
-        }
+            origin: "*", //allowing cors from anywhere
+        },
     });
-    io.on("connection", function (socket) {
-        console.log("user joined: ".concat(socket.id));
-        socket.on("disconnect", function (reason) {
+    io.on("connection", (socket) => {
+        console.log(`user joined: ${socket.id}`);
+        socket.on("disconnect", (reason) => {
             removeUserFromLists({ id: socket.id });
-            console.log("user disconnected: ".concat(socket.id, " beacause of ").concat(reason));
+            console.log(`user disconnected: ${socket.id} beacause of ${reason}`);
         });
-        socket.on("text", function (message) {
+        socket.on("text", (message) => {
             io.emit("text", message);
         });
         socket.on("createRoom", createRoom(socket));
     });
-    var createRoom = function (socket) {
-        return function (_a) {
-            var roomId = _a.roomId, userName = _a.userName;
-            socket.join(roomId);
-            var user = { id: socket.id, name: userName };
-            addRoomToLists(user, { roomId: roomId });
-            io.emit("room created", { roomId: roomId, participants: [user] });
-            console.log("room: ".concat(roomId, " was created by: ").concat(socket.id));
-        };
+    const createRoom = (socket) => ({ roomId, userName }) => {
+        socket.join(roomId);
+        const user = { id: socket.id, name: userName };
+        addRoomToLists(user, { roomId });
+        io.emit("room created", { roomId, participants: [user] });
+        console.log(`room: ${roomId} was created by: ${socket.id}`);
     };
-    var getAllRooms = function () {
+    const getAllRooms = () => {
         var _a;
-        return (_a = Array.from(allRooms.entries()).map(function (_a) {
-            var roomId = _a[0], participants = _a[1];
-            return { roomId: roomId, participants: Array.from(participants.values()) };
+        return (_a = Array.from(allRooms.entries()).map(([roomId, participants]) => {
+            return { roomId, participants: Array.from(participants.values()) };
         })) !== null && _a !== void 0 ? _a : [];
     };
     return getAllRooms;
-}
-exports.init = init;
+};
+export default init;
