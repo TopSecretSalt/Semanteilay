@@ -1,10 +1,9 @@
+import 'dotenv/config';
 import express from "express";
 import * as http from "http";
 import init from "./socket.js"
 import next from "next";
 import { router as userRouter } from "./db/controllers/userController";
-
-console.log(process.env);
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });

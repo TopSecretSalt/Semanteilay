@@ -4,9 +4,8 @@ import { Router } from 'express'
 export const router = Router();
 
 router.post('/', async (req, res) => {
-    console.log('-1/2')
-    const user = repository.createEntity({name: req.body.name})
-    console.log('0/2');
+    
+    const user = repository.createEntity();
     let id = await repository.save(user)
 
     res.send({ id })

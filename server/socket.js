@@ -1,4 +1,6 @@
-import { Server } from "socket.io";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const socket_io_1 = require("socket.io");
 const allRooms = new Map();
 const userRooms = new Map();
 const removeUserFromLists = ({ id }) => {
@@ -24,7 +26,7 @@ const addRoomToLists = (user, room) => {
     allRooms.set(room.roomId, new Set([user]));
 };
 const init = (server) => {
-    const io = new Server(server, {
+    const io = new socket_io_1.Server(server, {
         cors: {
             origin: "*", //allowing cors from anywhere
         },
@@ -55,4 +57,4 @@ const init = (server) => {
     };
     return getAllRooms;
 };
-export default init;
+exports.default = init;
