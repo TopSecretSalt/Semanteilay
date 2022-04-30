@@ -4,6 +4,7 @@ import * as http from "http";
 import init from "./socket.js"
 import next from "next";
 import { router as userRouter } from "./db/controllers/userController";
+import { router as roomRouter } from "./db/controllers/roomController"
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
@@ -16,12 +17,17 @@ const server = http.createServer(app);
 nextApp.prepare().then(() => {
   const getAllRooms = init(server);
 
-  app.use('/user', userRouter);
+  app.use('/users', userRouter);
+  app.use('/rooms', roomRouter);
 
   app.get("/", async (req, res: any) => {
+    return nextApp.render(req, res, '/')
+  })
+
+  app.get("/play", async (req, res: any) => {
     res.rooms = getAllRooms()
 
-    return nextApp.render(req, res, '/')
+    return nextApp.render(req, res, '/play')
   })
 
   app.get("*", (req, res) => {
@@ -29,6 +35,6 @@ nextApp.prepare().then(() => {
   });
 
   server.listen(9000, () => {
-    console.log("listening on port 9000");
+    console.log("listening on http://localhost:9000/");
   });
 });

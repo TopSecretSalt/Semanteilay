@@ -9,8 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.7.1",
     "@emotion/react": "^11.9.0",
+    "@emotion/server": "^11.4.0",
     "@emotion/styled": "^11.8.1",
+    "@fontsource/roboto": "^4.5.5",
+    "@mui/icons-material": "^5.6.2",
     "@mui/material": "^5.6.2",
     "@types/express": "^4.17.13",
     "axios": "^0.27.2",
@@ -21,7 +25,8 @@
     "react-dom": "18.0.0",
     "redis-om": "^0.2.1",
     "socket.io": "^4.4.1",
-    "socket.io-client": "^4.4.1"
+    "socket.io-client": "^4.4.1",
+    "usehooks-ts": "^2.5.1"
   },
   "devDependencies": {
     "@types/node": "17.0.25",

@@ -41,6 +41,7 @@ const http = __importStar(require("http"));
 const socket_js_1 = __importDefault(require("./socket.js"));
 const next_1 = __importDefault(require("next"));
 const userController_1 = require("./db/controllers/userController");
+const roomController_1 = require("./db/controllers/roomController");
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = (0, next_1.default)({ dev });
 const handle = nextApp.getRequestHandler();
@@ -49,15 +50,19 @@ app.use(express_1.default.json());
 const server = http.createServer(app);
 nextApp.prepare().then(() => {
     const getAllRooms = (0, socket_js_1.default)(server);
-    app.use('/user', userController_1.router);
+    app.use('/users', userController_1.router);
+    app.use('/rooms', roomController_1.router);
     app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        res.rooms = getAllRooms();
         return nextApp.render(req, res, '/');
+    }));
+    app.get("/play", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        res.rooms = getAllRooms();
+        return nextApp.render(req, res, '/play');
     }));
     app.get("*", (req, res) => {
         return handle(req, res);
     });
     server.listen(9000, () => {
-        console.log("listening on port 9000");
+        console.log("listening on http://localhost:9000/");
     });
 });

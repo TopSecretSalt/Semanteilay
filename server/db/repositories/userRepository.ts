@@ -1,4 +1,4 @@
-import { Entity, Schema, Client, Repository } from 'redis-om'
+import { Entity, Schema } from 'redis-om'
 import client from "../redis";
 
 interface User {
