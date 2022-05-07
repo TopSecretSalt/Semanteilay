@@ -1,18 +1,46 @@
-import { Entity, Schema } from 'redis-om'
+import { Entity, Schema } from "redis-om";
 import client from "../redis";
-
-type ID = string;
+import { fetchUsers } from "./userRepository";
 
 interface Team {
-    members: ID[],
+  name: string;
+  members: string[];
 }
 
-class Team extends Entity {}
+class Team extends Entity {
+  formatted() {
+    return {
+      id: this.entityId,
+      name: this.name,
+      members: this.members ?? [],
+    };
+  }
 
-const schema = new Schema(
-    Team, {
-        members: { type: 'string[]'},
-    },
-)
+  static async populated(team: Team) {
+    const {id, name, members} = team.formatted();
+    return {
+      id, 
+      name,
+      members: await fetchUsers(members),
+    };
+  }
+}
+
+const schema = new Schema(Team, {
+  members: { type: "string[]" },
+  name: { type: "string" },
+});
 
 export const teamRepository = client.fetchRepository(schema);
+
+export const fetchTeams = async (teamsIds: string[]) => {
+  const teams = await Promise.all(teamsIds.map(teamId => teamRepository.fetch(teamId)));
+  return await Promise.all(teams.map(Team.populated));
+};
+
+export const initialize = async () => {
+  await teamRepository.createIndex();
+  console.log("team index built");
+};
+
+initialize();

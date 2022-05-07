@@ -10,5 +10,7 @@ class Team extends redis_om_1.Entity {
 }
 const schema = new redis_om_1.Schema(Team, {
     members: { type: 'string[]' },
+    socket: { type: 'string' },
+    name: { type: 'string' }
 });
 exports.teamRepository = redis_1.default.fetchRepository(schema);

@@ -1,10 +1,11 @@
 import 'dotenv/config';
 import express from "express";
 import * as http from "http";
-import init from "./socket.js"
+import * as socket from "./socket.js"
 import next from "next";
 import { router as userRouter } from "./db/controllers/userController";
 import { router as roomRouter } from "./db/controllers/roomController"
+import { getAllRooms } from './db/services/roomService';
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
@@ -15,7 +16,7 @@ app.use(express.json());
 const server = http.createServer(app);
 
 nextApp.prepare().then(() => {
-  const getAllRooms = init(server);
+  socket.default(server);
 
   app.use('/users', userRouter);
   app.use('/rooms', roomRouter);
@@ -24,10 +25,11 @@ nextApp.prepare().then(() => {
     return nextApp.render(req, res, '/')
   })
 
-  app.get("/play", async (req, res: any) => {
-    res.rooms = getAllRooms()
+  app.get("/lobby", async (req, res: any) => {
+    res.rooms = await getAllRooms();
+    console.log(res.rooms);
 
-    return nextApp.render(req, res, '/play')
+    return nextApp.render(req, res, '/lobby')
   })
 
   app.get("*", (req, res) => {

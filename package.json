@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "tsc server/server.ts -t es6 --skipLibCheck --allowSyntheticDefaultImports --esModuleInterop --module commonjs && node server/server.js",
+    "migrate": "tsc server/db/setup/buildIndices.ts -t es6 --skipLibCheck --allowSyntheticDefaultImports --esModuleInterop --module commonjs && node server/db/setup/buildIndices.js",
     "lint": "next lint"
   },
   "dependencies": {

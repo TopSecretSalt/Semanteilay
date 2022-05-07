@@ -9,16 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const redis_om_1 = require("redis-om");
-const client = new redis_om_1.Client();
-function connect() {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!client.isOpen()) {
-            yield client.open(process.env.REDIS_URL);
-        }
-    });
-}
-connect().then(() => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("db connected");
-}));
-exports.default = client;
+exports.getAllRooms = void 0;
+const roomRepository_1 = require("../repositories/roomRepository");
+const getAllRooms = () => __awaiter(void 0, void 0, void 0, function* () {
+    return yield (0, roomRepository_1.getAllRooms)();
+});
+exports.getAllRooms = getAllRooms;

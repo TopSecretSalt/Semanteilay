@@ -1,10 +1,14 @@
 import { FC } from "react";
 import styles from "./title.module.css";
 
-const Footer: FC = () => (
+interface TitleProps {
+  children: string;
+}
+
+const Title: FC<TitleProps> = (props) => (
   <h1 className={styles.title}>
-    Welcome to <a>This Shit</a>
+    Welcome to <a>{props.children}</a>
   </h1>
 );
 
-export default Footer;
+export default Title;

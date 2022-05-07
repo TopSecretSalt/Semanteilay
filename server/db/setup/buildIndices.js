@@ -9,16 +9,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
 const redis_om_1 = require("redis-om");
+const roomRepository_1 = require("../repositories/roomRepository");
 const client = new redis_om_1.Client();
+class Room extends redis_om_1.Entity {
+}
+const schema = new redis_om_1.Schema(Room, {
+    name: { type: 'string' },
+    teams: { type: 'string[]' },
+});
 function connect() {
     return __awaiter(this, void 0, void 0, function* () {
         if (!client.isOpen()) {
+            console.log("connected to db");
             yield client.open(process.env.REDIS_URL);
         }
     });
 }
-connect().then(() => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("db connected");
-}));
-exports.default = client;
+function build() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // connect();
+        // await client.fetchRepository(schema).createIndex();
+        // console.log('built index');
+        yield (0, roomRepository_1.initialize)();
+        console.log("success!");
+    });
+}
+build();

@@ -9,13 +9,13 @@ import { User } from "../models";
 import { signIn } from "../api/userApi";
 
 const Login: FC = () => {
-  const [storedUser, setStoredUser] = useLocalStorage<User>("user", { id: "", name: "" });
+  const [storedUser, setStoredUser] = useLocalStorage<User>("user", { name: "" });
   const { value: name, setValue: setName, bind } = useInput("");
   const router = useRouter();
 
   useEffect(() => {
-    router.prefetch("/play");
-  });
+    router.prefetch("/lobby");
+  }, [router]);
 
   useEffect(() => {
     setName(storedUser.name);
@@ -26,8 +26,8 @@ const Login: FC = () => {
 
     try {
       const id = await signIn(name);
-      setStoredUser({ id, name });
-      router.push("/play");
+      setStoredUser({ name });
+      router.push("/lobby");
     } catch (error) {
       console.error("couldn't sign in");
     }
@@ -35,7 +35,7 @@ const Login: FC = () => {
 
   return (
     <main>
-      <Title />
+      <Title>This shit</Title>
       <form onSubmit={handleSubmit}>
         <TextField {...bind} label="nickname" sx={{ margin: 1 }} />
         <Button type="submit" sx={{ width: "15ch" }}>

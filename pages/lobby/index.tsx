@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import { useContext, useEffect, FormEventHandler } from "react";
-import styles from "./play.module.css";
+import styles from "./lobby.module.css";
 import { SocketContext } from "../../context/socket";
 import Title from "../../components/title";
 import { Room, User } from "../../models";
@@ -18,10 +18,10 @@ export const getServerSideProps = ({ res }: any) => {
   };
 };
 
-interface PlayProps {
+interface LobbyProps {
   allRooms: Room[];
 }
-const Play: NextPage<PlayProps> = ({ allRooms }) => {
+const Lobby: NextPage<LobbyProps> = ({ allRooms }) => {
   const socket = useContext(SocketContext);
   const user = useReadLocalStorage<User>("user");
   const [rooms, addRoom] = useRooms(allRooms);
@@ -39,8 +39,8 @@ const Play: NextPage<PlayProps> = ({ allRooms }) => {
 
   const createNewRoom = async (roomName: string) => {
     try {
-      const { roomId, teamId } = await createRoomBy(roomName, user as User);
-      console.log(`created room with id ${roomId} and team with id ${teamId}`);
+      const room = await createRoomBy(roomName, user as User, socket);
+      console.log(`created room with id ${room}`);
     } catch (error) {
       console.error("failed to create new room");
     }
@@ -48,11 +48,11 @@ const Play: NextPage<PlayProps> = ({ allRooms }) => {
 
   return (
     <main>
-      <Title />
+      <Title>Lobby</Title>
       <CreateRoom handleCreate={createNewRoom} />
       <Rooms rooms={rooms} />
     </main>
   );
 };
 
-export default Play;
+export default Lobby;

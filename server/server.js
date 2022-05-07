@@ -38,10 +38,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const http = __importStar(require("http"));
-const socket_js_1 = __importDefault(require("./socket.js"));
+const socket = __importStar(require("./socket.js"));
 const next_1 = __importDefault(require("next"));
 const userController_1 = require("./db/controllers/userController");
 const roomController_1 = require("./db/controllers/roomController");
+const roomService_1 = require("./db/services/roomService");
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = (0, next_1.default)({ dev });
 const handle = nextApp.getRequestHandler();
@@ -49,15 +50,16 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const server = http.createServer(app);
 nextApp.prepare().then(() => {
-    const getAllRooms = (0, socket_js_1.default)(server);
+    socket.default(server);
     app.use('/users', userController_1.router);
     app.use('/rooms', roomController_1.router);
     app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return nextApp.render(req, res, '/');
     }));
-    app.get("/play", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        res.rooms = getAllRooms();
-        return nextApp.render(req, res, '/play');
+    app.get("/lobby", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        res.rooms = yield (0, roomService_1.getAllRooms)();
+        console.log(res.rooms);
+        return nextApp.render(req, res, '/lobby');
     }));
     app.get("*", (req, res) => {
         return handle(req, res);

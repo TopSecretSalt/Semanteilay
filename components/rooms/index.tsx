@@ -9,10 +9,10 @@ interface RoomsProps {
 const Rooms: FC<RoomsProps> = ({ rooms }) => {
   return (
     <div className={styles.grid}>
-      {rooms.map(({ roomId }) => {
+      {rooms.map(({ roomId, name }) => {
         return (
           <a key={roomId} className={styles.card}>
-            <h2>{roomId}</h2>
+            <h2>{name}</h2>
           </a>
         );
       })}
