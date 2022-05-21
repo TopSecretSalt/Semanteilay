@@ -9,24 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.router = void 0;
-const express_1 = require("express");
+exports.removeSocket = exports.createRoom = void 0;
 const userService_1 = require("../services/userService");
-exports.router = (0, express_1.Router)();
-exports.router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const id = yield (0, userService_1.signUp)(req.body.name, req.body.socketId);
-        res.send({ id });
-    }
-    catch (err) {
-        res.status(409).send(err);
-    }
-}));
-exports.router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield (0, userService_1.getUserById)(req.params.id);
-    res.send(user);
-}));
-exports.router.get("", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield (0, userService_1.getAllUsers)();
-    res.send(users);
-}));
+const createRoom = (socket, io) => ({ roomId, userName }) => {
+    socket.join(roomId);
+    io.emit("room created", { roomId, participants: [userName] });
+    console.log(`room: ${roomId} was created by: ${socket.id}`);
+};
+exports.createRoom = createRoom;
+const removeSocket = (socket) => () => {
+    const userId = socket.data.userId;
+    console.log(`user left with id: ${userId}`);
+    socket.rooms.forEach((roomId) => __awaiter(void 0, void 0, void 0, function* () {
+        if (roomId !== socket.id) {
+            yield (0, userService_1.leaveRoom)(userId, roomId);
+            socket.to(roomId).emit("participantUpdate");
+        }
+    }));
+    (0, userService_1.deleteUser)(userId);
+};
+exports.removeSocket = removeSocket;

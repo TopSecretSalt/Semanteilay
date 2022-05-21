@@ -16,7 +16,7 @@ const Lobby: NextPage = () => {
     socket.emit("joinLobby");
   }, [socket]);
 
-  const createNewRoom = async (roomName: string) => { // move this to useRoom
+  const createNewRoom = async (roomName: string) => { // TODO: move this to useRoom
     try {
       const { id, name } = await createRoom(roomName);
       router.prefetch("/room");

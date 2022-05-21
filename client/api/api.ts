@@ -11,7 +11,14 @@ export const getApi = (baseUrl: string) => async (path = "", payload = {}) => {
 
 export const postApi = (baseUrl: string) => async (payload = {}, path = "") => {
   const res = await axios.post(`${SERVER_URL + baseUrl + path}`, payload);
-  console.log('request succeeded');
+
+  if (res.status !== 200) throw new Error(`${res.status}: ${res.statusText}`);
+
+  return res.data;
+};
+
+export const patchApi = (baseUrl: string) => async (payload = {}, path = "") => {
+  const res = await axios.patch(`${SERVER_URL + baseUrl + path}`, payload);
 
   if (res.status !== 200) throw new Error(`${res.status}: ${res.statusText}`);
 

@@ -18,7 +18,7 @@ exports.router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, functio
     res.send(room);
 }));
 exports.router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const room = yield (0, roomService_1.getRoomById)(req.params.id);
+    const room = yield (0, roomService_1.getPopulatedRoomById)(req.params.id);
     res.send(room);
 }));
 exports.router.get('', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

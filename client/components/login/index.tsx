@@ -1,5 +1,5 @@
-import { Button, TextField } from "@mui/material";
-import { FC, FormEventHandler, useEffect } from "react";
+import { Alert, AlertTitle, Button, TextField } from "@mui/material";
+import { FC, FormEventHandler, useEffect, useState } from "react";
 import styles from "./login.module.css";
 import { useRouter } from "next/router";
 import { useInput } from "../../hooks/useInput";
@@ -10,6 +10,7 @@ import useUser from "../../hooks/useUser"
 const Login: FC = () => {
   const [lastNickname, setLastNickname] = useLocalStorage("last-nickname", "");
   const { value: name, setValue: setName, bind: bindInput } = useInput("");
+  const [warning, setWarning] = useState(false);
   const router = useRouter();
   const { signUp } = useUser();
 
@@ -25,11 +26,11 @@ const Login: FC = () => {
     event.preventDefault();
 
     try {
-      await signUp({name}); // TODO: add unique usernames?
+      await signUp({name});
       setLastNickname(name);
       router.push("/lobby");
     } catch (error) {
-      console.error("couldn't sign in");
+      setWarning(true);
     }
   };
 
@@ -42,6 +43,10 @@ const Login: FC = () => {
           <b>Play</b>
         </Button>
       </form>
+      {warning && <Alert severity="warning">
+        <AlertTitle>Nickname taken</AlertTitle>
+        Try a different name nerd
+      </Alert>}
     </main>
   );
 };

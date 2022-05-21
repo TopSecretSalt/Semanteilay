@@ -6,7 +6,10 @@ import { SocketContext } from "../context/socket";
 import { useContext, useEffect } from "react";
 
 export const useRoom = (id: string) => {
-  const { data: room, error, mutate } = useSWR([url, id], fetcher);
+  const { data: room, error, mutate } = useSWR([url, id], fetcher, {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: false
+  });
   const socket = useContext(SocketContext);
   const isLoading = !room && !error;
 
@@ -19,7 +22,7 @@ export const useRoom = (id: string) => {
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading]); // happens once after the data
+  }, [isLoading, socket]); // happens once after the data
 
   useEffect(() => {
     socket.on("participantUpdate", mutate);

@@ -32,37 +32,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeTeamFromRoom = exports.addTeamToRoom = exports.getPopulatedRoomById = exports.getRoomById = exports.getAllRooms = exports.createRoom = void 0;
+exports.deleteUser = exports.leaveRoom = exports.getUserById = exports.getAllUsers = exports.signUp = void 0;
 const socket_1 = require("../socket/socket");
-const repository = __importStar(require("../repositories/roomRepository"));
-const createRoom = (name) => __awaiter(void 0, void 0, void 0, function* () { return yield repository.createRoom(name); });
-exports.createRoom = createRoom;
-const getAllRooms = () => __awaiter(void 0, void 0, void 0, function* () {
-    const rooms = yield repository.getAllRooms();
-    return rooms.map((room) => {
-        const participantCount = (0, socket_1.getParticipantCount)(room);
-        return Object.assign(Object.assign({}, room), { participantCount });
-    });
-});
-exports.getAllRooms = getAllRooms;
-const getRoomById = (id) => __awaiter(void 0, void 0, void 0, function* () { return (yield repository.getRoomById(id)).formatted(); });
-exports.getRoomById = getRoomById;
-const getPopulatedRoomById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const room = yield repository.getRoomById(id);
-    const populatedRoom = yield room.populate();
-    const participantCount = (0, socket_1.getParticipantCount)(populatedRoom);
-    return Object.assign(Object.assign({}, populatedRoom), { participantCount });
-});
-exports.getPopulatedRoomById = getPopulatedRoomById;
-const addTeamToRoom = (roomId, teamId) => __awaiter(void 0, void 0, void 0, function* () {
-    const room = yield repository.getRoomById(roomId);
-    yield room.addTeam(teamId);
-});
-exports.addTeamToRoom = addTeamToRoom;
-const removeTeamFromRoom = (roomId, teamId) => __awaiter(void 0, void 0, void 0, function* () {
-    const room = yield repository.removeTeam(teamId, roomId);
-    if (room.isEmpty()) {
-        yield room.delete();
+const repository = __importStar(require("../repositories/userRepository"));
+const roomService_1 = require("./roomService");
+const teamService_1 = require("./teamService");
+const signUp = (name, socketId) => __awaiter(void 0, void 0, void 0, function* () {
+    if (yield repository.isNameTaken(name)) {
+        throw new Error("nickname taken");
     }
+    const { entityId: id } = yield repository.createUser(name);
+    yield (0, socket_1.hookSocketWithUser)(id, socketId);
+    return id;
 });
-exports.removeTeamFromRoom = removeTeamFromRoom;
+exports.signUp = signUp;
+const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () { return yield repository.getAllUsers(); });
+exports.getAllUsers = getAllUsers;
+const getUserById = (id) => __awaiter(void 0, void 0, void 0, function* () { return yield repository.getUserById(id); });
+exports.getUserById = getUserById;
+const leaveRoom = (userId, roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    const room = yield (0, roomService_1.getRoomById)(roomId);
+    room.teams.forEach((team) => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, teamService_1.leaveTeam)(userId, team, roomId);
+    }));
+});
+exports.leaveRoom = leaveRoom;
+const deleteUser = (userId) => __awaiter(void 0, void 0, void 0, function* () { return yield repository.deleteUser(userId); });
+exports.deleteUser = deleteUser;

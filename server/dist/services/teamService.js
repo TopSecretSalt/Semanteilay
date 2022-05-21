@@ -32,9 +32,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTeam = exports.getTeamById = void 0;
+exports.getAllTeams = exports.changeTeam = exports.joinTeam = exports.leaveTeam = exports.createTeam = exports.getTeamById = void 0;
 const repository = __importStar(require("../repositories/teamRepository"));
+const roomService_1 = require("./roomService");
 const getTeamById = (id) => __awaiter(void 0, void 0, void 0, function* () { return yield repository.getTeamById(id); });
 exports.getTeamById = getTeamById;
-const createTeam = ({ name, members }) => __awaiter(void 0, void 0, void 0, function* () { return yield repository.createTeam(name, members); });
+const createTeam = ({ name, userId, roomId }) => __awaiter(void 0, void 0, void 0, function* () {
+    const team = yield repository.createTeam(name, userId);
+    yield (0, roomService_1.addTeamToRoom)(roomId, team.id);
+    return team;
+});
 exports.createTeam = createTeam;
+const leaveTeam = (userId, teamId, roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    const team = yield repository.leaveTeam(userId, teamId);
+    if (team.isEmpty()) {
+        yield (0, roomService_1.removeTeamFromRoom)(roomId, teamId);
+        yield repository.deleteTeam(teamId);
+    }
+});
+exports.leaveTeam = leaveTeam;
+const joinTeam = (userId, teamId) => __awaiter(void 0, void 0, void 0, function* () {
+    yield repository.joinTeam(userId, teamId);
+});
+exports.joinTeam = joinTeam;
+const changeTeam = (userId, teamId, roomdId) => __awaiter(void 0, void 0, void 0, function* () {
+    const oldTeam = yield repository.getTeamByUser(userId);
+    console.log("changing teams");
+    if (oldTeam && oldTeam.entityId !== teamId) { // TODO: maybe fix band-aid looking code
+        console.log("leaving old team");
+        yield (0, exports.leaveTeam)(userId, oldTeam.entityId, roomdId);
+    }
+    yield (0, exports.joinTeam)(userId, teamId); // TODO: fix having two replica members in team
+});
+exports.changeTeam = changeTeam;
+const getAllTeams = () => __awaiter(void 0, void 0, void 0, function* () { return yield repository.getAllTeams(); });
+exports.getAllTeams = getAllTeams;

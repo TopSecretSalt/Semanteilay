@@ -2,30 +2,35 @@ import { useRouter } from "next/router";
 import { useCallback, useContext, useEffect } from "react";
 import { SocketContext } from "../context/socket";
 import { User } from "../models";
-import useSessionStorage from "./userSessionStorage";
 import { signUp as saveUser } from "../api/userApi";
+import { UserContext, UserContextType } from "../context/userProvider";
+import { changeUserTeam } from "../api/teamsApi";
 
-const emptyUser: User = { name: "", id: "", socketId: "" };
+const emptyUser: User = { name: "", id: "" };
 
 const useUser = () => {
-  const [user, setUser] = useSessionStorage("user", emptyUser);
+  const { user, setUser } = useContext(UserContext) as UserContextType;
   const socket = useContext(SocketContext);
   const router = useRouter();
 
-  const signOut = useCallback(() => setUser(emptyUser), [setUser]);
+  const signOut = useCallback(() => {
+    setUser(emptyUser); // TODO: when server goes down the entities currently stay in DB
+  }, [setUser]);
 
   const signIn = (user: User) => {
     setUser(user);
   };
 
-  const signUp = async ({ name }: Omit<User, "socketId" | "id">) => {
-    const { id } = await saveUser(name);
-    signIn({ id, name, socketId: socket.id });
+  const signUp = async ({ name }: Omit<User, "id">) => {
+    const { id } = await saveUser(name, socket.id); // TODO: when socket disconnects delete user and go back to login
+    signIn({ id, name });
   };
 
-  const changeTeam = (teamId: string) => {
-    setUser({...user, teamId});
-  }
+  const changeTeam = async (teamId: string, roomId: string) => {
+    changeUserTeam(user.id, teamId, roomId);
+    console.log(`changed team to ${teamId}`);
+    setUser({ ...user, teamId });
+  };
 
   useEffect(() => {
     socket.on("disconnect", signOut);

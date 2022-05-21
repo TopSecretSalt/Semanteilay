@@ -1,4 +1,4 @@
-import { getAllRooms, createRoom, getRoomById } from "../services/roomService";
+import { getAllRooms, createRoom, getPopulatedRoomById } from "../services/roomService";
 import { Router } from 'express'
 
 export const router = Router();
@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-    const room = await getRoomById(req.params.id);
+    const room = await getPopulatedRoomById(req.params.id);
     res.send(room)
 })
 

@@ -16,13 +16,35 @@ class Room extends Entity {
     };
   }
 
-  static async populated(room: Room) {
-    const {id, name, teams} = room.formatted();
+  async delete() {
+    await roomRepository.remove(this.entityId);
+  }
+  
+  isEmpty() {
+    return this.teams.length === 0;
+  }
+
+  async addTeam(teamId: string) {
+    this.teams.push(teamId);
+    await roomRepository.save(this);
+  }
+
+  async removeTeam(teamId: string) {
+    this.teams = this.teams.filter(team => team !== teamId)
+    await roomRepository.save(this);
+  }
+
+  async populate() {
+    const { id, name, teams } = this.formatted();
     return {
-      id, 
+      id,
       name,
       teams: await fetchTeams(teams),
     };
+  }
+
+  static async populated(room: Room) {
+    return await room.populate();
   }
 }
 
@@ -33,17 +55,26 @@ const schema = new Schema(Room, {
 
 export const roomRepository = client.fetchRepository(schema);
 
-export const getAllRooms = async () => (await roomRepository.search().return.all()).map(room => room.formatted())
+export const getAllRooms = async () =>
+  (await roomRepository.search().return.all()).map((room) => room.formatted());
 
-export const populate = async (rooms: Room[]) => await Promise.all(rooms.map(Room.populated))
+export const populate = async (rooms: Room[]) => await Promise.all(rooms.map(Room.populated));
 
-export const createRoom = async (name: string) => (await roomRepository.createAndSave({ name })).formatted()
+export const createRoom = async (name: string) =>
+  (await roomRepository.createAndSave({ name, teams: [] })).formatted();
 
-export const getRoomById = async (id: string) => (await roomRepository.fetch(id)).formatted();
+export const getRoomById = async (id: string) => await roomRepository.fetch(id);
+
+export const removeTeam = async (teamId: string, roomId: string) => {
+  const room = await roomRepository.fetch(roomId);
+  await room.removeTeam(teamId);
+
+  return room;
+}
 
 export const initialize = async () => {
   await roomRepository.createIndex();
   console.log("room index built");
 };
 
-initialize()
+initialize();
