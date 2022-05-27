@@ -27,8 +27,7 @@ const useUser = () => {
   };
 
   const changeTeam = async (teamId: string, roomId: string) => {
-    changeUserTeam(user.id, teamId, roomId);
-    console.log(`changed team to ${teamId}`);
+    if (user.teamId) changeUserTeam(user.id, teamId, roomId);
     setUser({ ...user, teamId });
   };
 
