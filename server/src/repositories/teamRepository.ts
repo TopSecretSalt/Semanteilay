@@ -80,14 +80,7 @@ export const joinTeam = async (userId: string, teamId: string) => {
   await team.addMember(userId);
 };
 
-export const getTeamByUser = async (userId: string) => {
-  console.log(`searching team with user of id: ${userId}`);
-  const team = await teamRepository.search().where('members').contain(userId).returnFirst();
-  console.log("found:");
-  console.log(team);
-  
-  return team;
-};
+export const getTeamByUser = async (userId: string) =>  await teamRepository.search().where('members').contain(userId).returnFirst();
 
 export const initialize = async () => {
   await teamRepository.createIndex();

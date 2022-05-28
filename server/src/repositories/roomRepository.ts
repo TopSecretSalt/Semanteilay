@@ -21,7 +21,7 @@ class Room extends Entity {
   }
   
   isEmpty() {
-    return this.teams.length === 0;
+    return this.teams ? this.teams.length === 0 : true
   }
 
   async addTeam(teamId: string) {
@@ -71,6 +71,8 @@ export const removeTeam = async (teamId: string, roomId: string) => {
 
   return room;
 }
+
+export const deleteRoom = async (roomId: string) => await roomRepository.remove(roomId);
 
 export const initialize = async () => {
   await roomRepository.createIndex();

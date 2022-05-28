@@ -12,15 +12,15 @@ export const getAllRooms = async () => {
   });
 };
 
-export const getRoomById = async (id: string) => (await repository.getRoomById(id)).formatted()
+export const getRoomById = async (id: string) => (await repository.getRoomById(id)).formatted();
 
 export const getPopulatedRoomById = async (id: string) => {
-  const room =  await repository.getRoomById(id);
+  const room = await repository.getRoomById(id);
   const populatedRoom = await room.populate();
   const participantCount = getParticipantCount(populatedRoom);
 
   return { ...populatedRoom, participantCount };
-}
+};
 
 export const addTeamToRoom = async (roomId: string, teamId: string) => {
   const room = await repository.getRoomById(roomId);
@@ -33,4 +33,10 @@ export const removeTeamFromRoom = async (roomId: string, teamId: string) => {
   if (room.isEmpty()) {
     await room.delete();
   }
-}
+};
+
+export const deleteRoomIfEmpty = async (roomId: string) => {
+  const room = await repository.getRoomById(roomId);
+
+  if (room.isEmpty()) await room.delete();
+};

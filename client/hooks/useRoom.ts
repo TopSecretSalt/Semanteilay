@@ -36,5 +36,6 @@ export const useRoom = (id: string) => {
     room: room as Room,
     isLoading,
     isError: error as Error,
+    updateRoom: mutate,
   };
 };

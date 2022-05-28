@@ -1,8 +1,7 @@
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import * as http from "http";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { userMiddleware } from "./middlewares";
-import { createRoom, removeSocket } from "./socketListeners";
+import { createRoom, removeSocket, handleLeaveRoom } from "./socketListeners";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 
@@ -29,11 +28,7 @@ const init = (server: http.Server) => {
       io.of("/").to(id).emit("participantUpdate");
     });
 
-    socket.on("leaveRoom", ({ id }) => {
-      socket.leave(id);
-      console.log(`left: ${socket.id}`);
-      io.of("/").to(id).emit("participantUpdate");
-    });
+    socket.on("leaveRoom", handleLeaveRoom(socket, io));
 
     socket.on("joinLobby", () => {
       socket.join("lobby");

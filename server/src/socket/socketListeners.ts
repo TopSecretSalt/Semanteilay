@@ -18,15 +18,22 @@ export const createRoom: SocketListener =
 
 export const removeSocket: SocketListener = (socket) => () => {
   const userId = socket.data.userId;
-
   console.log(`user left with id: ${userId}`);
 
   socket.rooms.forEach(async (roomId) => {
-    if (roomId !== socket.id) {
+    if (roomId !== socket.id && roomId !== 'lobby') { //TODO: add lobby leave
       await leaveRoom(userId, roomId);
       socket.to(roomId).emit("participantUpdate");
     }
   });
   
   deleteUser(userId);
+};
+
+export const handleLeaveRoom: SocketListener = (socket, io) => async ({ id }) => {
+  const userId = socket.data.userId;
+  socket.leave(id);
+  console.log(`left: ${socket.id}`);
+  await leaveRoom(userId, id)
+  io.of("/").to(id).emit("participantUpdate");
 };

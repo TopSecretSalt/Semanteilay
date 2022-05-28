@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllUsers, getUserById, signUp } from "../services/userService";
+import { getAllUsers, getUserById, signUp, leaveRoom } from "../services/userService";
 
 export const router = Router();
 
@@ -20,4 +20,10 @@ router.get("/:id", async (req, res) => {
 router.get("", async (req, res) => {
   const users = await getAllUsers();
   res.send(users);
+})
+
+router.delete("/room", async (req, res) => {
+  console.log('leave room request');
+  await leaveRoom(req.body.userId, req.body.roomId)
+  res.status(200).send()
 })

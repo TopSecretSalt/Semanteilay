@@ -16,7 +16,8 @@ export const createTeam = async ({ name, userId, roomId }: CreateTeamParams) => 
   return team;
 };
 
-export const leaveTeam = async (userId: string, teamId: string, roomId: string) => {
+export const leaveTeam = async (userId: string, roomId: string, teamId?: string) => {
+  teamId = teamId ?? (await getTeamByUser(userId)).entityId;
   const team = await repository.leaveTeam(userId, teamId);
 
   if (team.isEmpty()) {
@@ -29,15 +30,13 @@ export const joinTeam = async (userId: string, teamId: string) => {
   await repository.joinTeam(userId, teamId);
 };
 
-export const changeTeam = async (userId: string, teamId: string, roomdId: string) => {
-  const oldTeam = await repository.getTeamByUser(userId);
-  console.log("changing teams");
-  if (oldTeam && oldTeam.entityId !== teamId) { // TODO: maybe fix band-aid looking code
-    console.log("leaving old team");
-    await leaveTeam(userId, oldTeam.entityId, roomdId);
-  }
+export const getTeamByUser = async (userId: string) => await repository.getTeamByUser(userId);
 
-  await joinTeam(userId, teamId); // TODO: fix having two replica members in team
+export const changeTeam = async (userId: string, teamId: string, roomdId: string) => {
+  const oldTeam = await getTeamByUser(userId);
+  if (oldTeam && oldTeam.entityId !== teamId) await leaveTeam(userId, roomdId, oldTeam.entityId); // TODO: maybe fix band-aid looking code
+
+  await joinTeam(userId, teamId);
 };
 
 export const getAllTeams = async () => await repository.getAllTeams();
