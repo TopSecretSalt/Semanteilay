@@ -18,7 +18,7 @@ export const useRoom = (id: string) => {
       socket.emit("joinRoom", room);
 
       return () => {
-        socket.emit("leaveRoom", room);
+        socket.emit("leaveRoom", room); // TODO: leave room with 2 users bug, might not be from here
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

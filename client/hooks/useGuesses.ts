@@ -3,8 +3,9 @@ import { fetcher } from "../api/api";
 import useSWR from "swr";
 import { Guess } from "../models";
 import { guess } from "../api/semantleApi";
-import { useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import useUser from "./useUser";
+import { SocketContext } from "../context/socket";
 
 function reducer(state: Guess[], action: { payload: Guess[]; type: "add" | 'update' }) {
   switch (action.type) {
@@ -20,6 +21,7 @@ function reducer(state: Guess[], action: { payload: Guess[]; type: "add" | 'upda
 }
 
 export const useGuesses = () => {
+  const socket = useContext(SocketContext);
   const { user } = useUser();
   const { data, error } = useSWR([url, user.teamId], fetcher, {
     revalidateIfStale: false,
@@ -32,9 +34,22 @@ export const useGuesses = () => {
     dispatch({ payload: data ?? ([] as Guess[]), type: "update" });
   }, [data]);
 
+  useEffect(() => {
+    const addGuess = (guess: Guess) => {
+      dispatch({ payload: [guess], type: "add" });
+      console.log(guess);
+    }
+    socket.on("newGuess", addGuess);
+
+    return () => {
+      socket.removeListener("newGuess", addGuess);
+    };
+  }, [socket]);
+
   const addGuess = async (guess: Guess) => {
     await postGuess(guess);
     dispatch({ payload: [guess], type: "add" });
+    socket.emit("newGuess", guess);
   };
 
   return {

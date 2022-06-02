@@ -15,7 +15,7 @@ const Guesses: FC = () => {
       <MakeGuess
         handleGuess={async (word: string) => {
           const {similarity: score, distance: rank} = await guess(word);
-          addGuess({word, score, rank, owner: user.id, team: user.teamId as string});
+          addGuess({word, score, rank, owner: user.id, team: user.teamId as string}); // TODO: add last guess view
         }}
       />
       <div>

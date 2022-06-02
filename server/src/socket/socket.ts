@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import * as http from "http";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import { createRoom, removeSocket, handleLeaveRoom } from "./socketListeners";
+import { removeSocket, handleLeaveRoom, handleNewGuess, handleJoinTeam, handleLeaveTeam } from "./socketListeners";
 
 let io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 
@@ -19,8 +19,9 @@ const init = (server: http.Server) => {
     });
 
     socket.on("disconnecting", removeSocket(socket, io));
-
-    socket.on("createRoom", createRoom(socket, io));
+    socket.on("newGuess", handleNewGuess(socket, io));
+    socket.on("joinTeam", handleJoinTeam(socket, io))
+    socket.on("leaveTeam", handleLeaveTeam(socket, io))
 
     socket.on("joinRoom", ({ id }) => {
       socket.join(id);

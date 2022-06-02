@@ -27,7 +27,12 @@ const useUser = () => {
   };
 
   const changeTeam = async (teamId: string, roomId: string) => {
-    if (user.teamId) changeUserTeam(user.id, teamId, roomId);
+    if (user.teamId) {
+      changeUserTeam(user.id, teamId, roomId);
+      socket.emit("leaveTeam", user.teamId);
+    }
+
+    socket.emit("joinTeam", teamId);
     setUser({ ...user, teamId });
   };
 

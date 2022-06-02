@@ -7,15 +7,6 @@ type SocketListener = (
   io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
 ) => (...args: any) => void;
 
-export const createRoom: SocketListener =
-  (socket, io) =>
-  ({ roomId, userName }: { roomId: string; userName: string }) => {
-    socket.join(roomId);
-
-    io.emit("room created", { roomId, participants: [userName] });
-    console.log(`room: ${roomId} was created by: ${socket.id}`);
-  };
-
 export const removeSocket: SocketListener = (socket) => () => {
   const userId = socket.data.userId;
   console.log(`user left with id: ${userId}`);
@@ -36,4 +27,18 @@ export const handleLeaveRoom: SocketListener = (socket, io) => async ({ id }) =>
   console.log(`left: ${socket.id}`);
   await leaveRoom(userId, id)
   io.of("/").to(id).emit("participantUpdate");
+};
+
+export const handleNewGuess: SocketListener = (socket, io) => async (guess) => {
+  socket.to(guess.team).emit("newGuess", guess);
+};
+
+export const handleJoinTeam: SocketListener = (socket, io) => async (teamId) => {
+  console.log(`socket: ${socket.id} joined team: ${teamId}`)
+  socket.join(teamId);
+};
+
+export const handleLeaveTeam: SocketListener = (socket, io) => async (teamId) => {
+  console.log(`socket: ${socket.id} left team: ${teamId}`)
+  socket.leave(teamId);
 };
