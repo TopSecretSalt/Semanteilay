@@ -11,34 +11,42 @@ export const removeSocket: SocketListener = (socket) => () => {
   const userId = socket.data.userId;
   console.log(`user left with id: ${userId}`);
 
-  socket.rooms.forEach(async (roomId) => {
-    if (roomId !== socket.id && roomId !== 'lobby') { //TODO: add lobby leave
+  Array.from(socket.rooms)
+    .filter(isTeam(socket))
+    .forEach(async (roomId) => {
+      //TODO: add lobby leave
       await leaveRoom(userId, roomId);
       socket.to(roomId).emit("participantUpdate");
-    }
-  });
-  
+    });
+
   deleteUser(userId);
 };
 
-export const handleLeaveRoom: SocketListener = (socket, io) => async ({ id }) => {
-  const userId = socket.data.userId;
-  socket.leave(id);
-  console.log(`left: ${socket.id}`);
-  await leaveRoom(userId, id)
-  io.of("/").to(id).emit("participantUpdate");
-};
+export const handleLeaveRoom: SocketListener =
+  (socket, io) =>
+  async ({ id }) => {
+    const userId = socket.data.userId;
+    socket.leave(id);
+    socket.leave(Array.from(socket.rooms).find(isTeam(socket)) as string);
+    await leaveRoom(userId, id);
+    io.to(socket.id).emit("kickFromTeam");
+    io.of("/").to(id).emit("participantUpdate");
+  };
 
 export const handleNewGuess: SocketListener = (socket, io) => async (guess) => {
   socket.to(guess.team).emit("newGuess", guess);
 };
 
 export const handleJoinTeam: SocketListener = (socket, io) => async (teamId) => {
-  console.log(`socket: ${socket.id} joined team: ${teamId}`)
+  console.log(`socket: ${socket.id} joined team: ${teamId}`);
   socket.join(teamId);
 };
 
 export const handleLeaveTeam: SocketListener = (socket, io) => async (teamId) => {
-  console.log(`socket: ${socket.id} left team: ${teamId}`)
+  console.log(`socket: ${socket.id} left team: ${teamId}`);
   socket.leave(teamId);
 };
+
+const isTeam =
+  (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => (roomId: string) =>
+    roomId !== socket.id && roomId !== "lobby";

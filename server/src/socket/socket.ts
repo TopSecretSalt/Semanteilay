@@ -5,7 +5,7 @@ import { removeSocket, handleLeaveRoom, handleNewGuess, handleJoinTeam, handleLe
 
 let io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>;
 
-const init = (server: http.Server) => {
+export const init = (server: http.Server) => {
   io = new Server(server, {
     cors: {
       origin: "*", //allowing cors from anywhere
@@ -46,5 +46,3 @@ export const getParticipantCount = ({ id }: { id: string }) =>
 
 export const hookSocketWithUser = async (userId: string, socketId: string) =>
   ((await io.in(socketId).fetchSockets())[0].data.userId = userId);
-
-export default init;

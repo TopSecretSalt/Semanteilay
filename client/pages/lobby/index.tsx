@@ -5,32 +5,20 @@ import { SocketContext } from "../../context/socket";
 import Title from "../../components/title";
 import Rooms from "../../components/rooms";
 import CreateRoom from "../../components/createRoom";
-import { createRoom } from "../../api/roomsApi";
-import { useRouter } from "next/router";
+import useUser from "../../hooks/useUser";
 
 const Lobby: NextPage = () => {
   const socket = useContext(SocketContext);
-  const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
     socket.emit("joinLobby");
   }, [socket]);
 
-  const createNewRoom = async (roomName: string) => { // TODO: move this to useRoom
-    try {
-      const { id, name } = await createRoom(roomName);
-      router.prefetch("/room");
-      router.push({ pathname: "/room", query: { id } }, `/room/${name.replaceAll(" ", "-")}`); // TODO: add "as" but have ability to refresh
-      console.log(`created room with id ${id}`);
-    } catch (error) {
-      console.error("failed to create new room");
-    }
-  };
-
   return (
     <main>
       <Title>Lobby</Title>
-      <CreateRoom handleCreate={createNewRoom} />
+      <CreateRoom user={user}/>
       <Rooms />
     </main>
   );

@@ -11,11 +11,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
+    "redis": "^4.1.0",
     "redis-om": "^0.2.1",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
+    "@types/connect-redis": "^0.0.18",
     "@types/express": "^4.17.13",
+    "@types/express-session": "^1.17.4",
     "@types/node": "17.0.25",
     "concurrently": "^7.1.0",
     "eslint": "8.13.0",

@@ -4,8 +4,8 @@ import { Router } from 'express'
 export const router = Router();
 
 router.post('/', async (req, res) => {
-    const room = await addGuess(req.body);
-    res.send(room);
+    const guess = await addGuess(req.body);
+    res.send(guess);
 })
 
 router.get('/', async (req, res) => {

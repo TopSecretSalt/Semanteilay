@@ -67,7 +67,8 @@ export const getRoomById = async (id: string) => await roomRepository.fetch(id);
 
 export const removeTeam = async (teamId: string, roomId: string) => {
   const room = await roomRepository.fetch(roomId);
-  await room.removeTeam(teamId);
+
+  if (!room.isEmpty()) await room.removeTeam(teamId);
 
   return room;
 }

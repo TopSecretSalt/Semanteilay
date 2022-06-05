@@ -6,7 +6,7 @@ const BASE_URL = "/guesses";
 const get = getApi(BASE_URL);
 const post = postApi(BASE_URL);
 
-export const addGuess = async (guess: Guess) => await post(guess);
+export const addGuess = async (guess: Omit<Guess, 'serialNumber'>) => await post(guess);
 
 export const getAllGuesses = async () => await get();
 

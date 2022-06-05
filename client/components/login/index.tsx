@@ -1,11 +1,11 @@
 import { Alert, AlertTitle, Button, TextField } from "@mui/material";
 import { FC, FormEventHandler, useEffect, useState } from "react";
-import styles from "./login.module.css";
 import { useRouter } from "next/router";
 import { useInput } from "../../hooks/useInput";
 import { useLocalStorage } from "usehooks-ts";
 import Title from "../title";
 import useUser from "../../hooks/useUser"
+import { AxiosError } from "axios";
 
 const Login: FC = () => {
   const [lastNickname, setLastNickname] = useLocalStorage("last-nickname", "");
@@ -30,7 +30,7 @@ const Login: FC = () => {
       setLastNickname(name);
       router.push("/lobby");
     } catch (error) {
-      setWarning(true);
+      if((error as AxiosError).response?.status === 409 ) setWarning(true);
     }
   };
 

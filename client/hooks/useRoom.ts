@@ -4,21 +4,27 @@ import { GET_ROOM_BY_ID_URL as url } from "../api/roomsApi";
 import { Room } from "../models";
 import { SocketContext } from "../context/socket";
 import { useContext, useEffect } from "react";
+import { useRouter } from "next/router";
 
 export const useRoom = (id: string) => {
-  const { data: room, error, mutate } = useSWR([url, id], fetcher, {
+  const {
+    data: room,
+    error,
+    mutate,
+  } = useSWR([url, id], fetcher, {
     revalidateOnFocus: true,
-    revalidateOnReconnect: false
+    revalidateOnReconnect: false,
   });
   const socket = useContext(SocketContext);
   const isLoading = !room && !error;
+  const router = useRouter();
 
   useEffect(() => {
     if (room) {
       socket.emit("joinRoom", room);
 
       return () => {
-        socket.emit("leaveRoom", room); // TODO: leave room with 2 users bug, might not be from here
+        socket.emit("leaveRoom", room);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,10 +38,15 @@ export const useRoom = (id: string) => {
     };
   }, [mutate, socket]);
 
+  function leaveRoom() {
+    router.push('/lobby');
+  }
+
   return {
     room: room as Room,
     isLoading,
     isError: error as Error,
     updateRoom: mutate,
+    leaveRoom,
   };
 };

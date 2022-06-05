@@ -8,5 +8,7 @@ export const guess = async (word: string) => {
 
   if (res.status !== 200) throw new Error(`${res.status}: ${res.statusText}`);
 
+  if (res.data.similarity === null) throw new Error("unknown word");
+
   return res.data;
 };

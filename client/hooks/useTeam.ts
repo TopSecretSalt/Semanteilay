@@ -6,7 +6,7 @@ import { Room } from "../models";
 import useUser from "./useUser";
 
 const useTeam = (room: Room, updateRoom: () => void) => {
-  const { user, changeTeam } = useUser();
+  const { user, changeTeam, leaveTeam } = useUser();
   const [name, setName] = useState(user.teamId ? "" : `${user.name}'s team`);
   const { data: team, error } = useSWR(user.teamId ? [url, user.teamId] : null, fetcher, {
     revalidateIfStale: false,
@@ -32,7 +32,7 @@ const useTeam = (room: Room, updateRoom: () => void) => {
 
   const changeName = useCallback((newName: string) => null, []);
 
-  return { name, switchTeam, changeTeamName: changeName };
+  return { name, switchTeam, changeTeamName: changeName, leaveTeam };
 };
 
 export default useTeam;

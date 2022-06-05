@@ -1,7 +1,12 @@
 import Guess from "../models/guess";
 import * as repository from "../repositories/guessReopository";
 
-export const addGuess = async (guess: Guess) => (await repository.addGuess(guess)).formatted();
+export const addGuess = async (guess: Guess) => {
+  const newGuess = (await repository.addGuess(guess)).formatted();
+  const guessNumber = (await getTeamGuesses(guess.team)).length + 1;
+  
+  return {...newGuess, serialNumber: guessNumber}
+};
 
 export const getAllGuesses = async () =>
   (await repository.getAllGuesses()).map((guess) => guess.formatted());

@@ -24,6 +24,7 @@ export const getPopulatedRoomById = async (id: string) => {
 
 export const addTeamToRoom = async (roomId: string, teamId: string) => {
   const room = await repository.getRoomById(roomId);
+
   await room.addTeam(teamId);
 };
 

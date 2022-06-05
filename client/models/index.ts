@@ -23,4 +23,5 @@ export type Guess = {
   rank: number,
   owner: string,
   team: string
+  serialNumber: number,
 }

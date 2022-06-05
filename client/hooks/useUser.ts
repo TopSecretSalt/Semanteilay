@@ -36,12 +36,25 @@ const useUser = () => {
     setUser({ ...user, teamId });
   };
 
+  const leaveTeam = () => {
+    setUser({ name: user.name, id: user.id});
+  };
+
   useEffect(() => {
     socket.on("disconnect", signOut);
+    
     return () => {
       socket.removeListener("disconnect", signOut); // TODO: reconsider ux when refresh kicks you out
     };
   }, [socket, user, signOut]);
+
+  useEffect(() => {
+    socket.on("kickFromTeam", leaveTeam);
+
+    return () => {
+      socket.removeListener("kickFromTeam", leaveTeam);
+    };
+  });
 
   useEffect(() => {
     if (user.name === "" && router.pathname !== "/") {
@@ -49,7 +62,7 @@ const useUser = () => {
     }
   }, [router, user]);
 
-  return { user, signUp, signOut, changeTeam };
+  return { user, signUp, signOut, changeTeam, leaveTeam };
 };
 
 export default useUser;

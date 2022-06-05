@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors({origin: 'http://localhost:3000'}))
 const server = http.createServer(app);
 
-socket.default(server);
+socket.init(server);
 
 app.use("/users", userRouter);
 app.use("/rooms", roomRouter);

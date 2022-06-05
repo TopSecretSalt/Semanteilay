@@ -10,9 +10,9 @@ import { SocketContext } from "../context/socket";
 function reducer(state: Guess[], action: { payload: Guess[]; type: "add" | 'update' }) {
   switch (action.type) {
     case "add":
-      return [...state, ...action.payload].sort(
+      return [...action.payload, ...state.sort(
         (guess, otherGuess) => otherGuess.score - guess.score
-      );
+      )];
     case "update":
       return action.payload;
     default:
@@ -46,9 +46,9 @@ export const useGuesses = () => {
     };
   }, [socket]);
 
-  const addGuess = async (guess: Guess) => {
-    await postGuess(guess);
-    dispatch({ payload: [guess], type: "add" });
+  const addGuess = async (guess: Omit<Guess, 'serialNumber'>) => {
+    const newGuess = await postGuess(guess);
+    dispatch({ payload: [newGuess], type: "add" });
     socket.emit("newGuess", guess);
   };
 
