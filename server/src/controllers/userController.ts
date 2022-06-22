@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getAllUsers, getUserById, signUp, leaveRoom } from "../services/userService";
+import {
+  getAllUsers,
+  getUserById,
+  signUp,
+  leaveRoom,
+} from "../services/userService";
 
 export const router = Router();
 
@@ -13,17 +18,28 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const user = await getUserById(req.params.id);
-  res.send(user);
+  try {
+    const user = await getUserById(req.params.id);
+    res.send(user);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 router.get("", async (req, res) => {
-  const users = await getAllUsers();
-  res.send(users);
-})
+  try {
+    const users = await getAllUsers();
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
 
 router.delete("/room", async (req, res) => {
-  console.log('leave room request');
-  await leaveRoom(req.body.userId, req.body.roomId)
-  res.status(200).send()
-})
+  try {
+    await leaveRoom(req.body.userId, req.body.roomId);
+    res.status(200).send();
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
