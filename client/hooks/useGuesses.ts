@@ -7,12 +7,13 @@ import { useContext, useEffect, useReducer } from "react";
 import useUser from "./useUser";
 import { SocketContext } from "../context/socket";
 
-function reducer(state: Guess[], action: { payload: Guess[]; type: "add" | 'update' }) {
+function reducer(state: Guess[], action: { payload: Guess[]; type: "add" | "update" }) {
   switch (action.type) {
     case "add":
-      return [...action.payload, ...state.sort(
-        (guess, otherGuess) => otherGuess.score - guess.score
-      )];
+      return [
+        ...action.payload,
+        ...state.sort((guess, otherGuess) => otherGuess.score - guess.score),
+      ];
     case "update":
       return action.payload;
     default:
@@ -38,7 +39,7 @@ export const useGuesses = () => {
     const addGuess = (guess: Guess) => {
       dispatch({ payload: [guess], type: "add" });
       console.log(guess);
-    }
+    };
     socket.on("newGuess", addGuess);
 
     return () => {
@@ -46,10 +47,26 @@ export const useGuesses = () => {
     };
   }, [socket]);
 
-  const addGuess = async (guess: Omit<Guess, 'serialNumber'>) => {
-    const newGuess = await postGuess(guess);
-    dispatch({ payload: [newGuess], type: "add" });
-    socket.emit("newGuess", guess);
+  const doesGuessExist = (guess: Omit<Guess, "serialNumber">) =>
+    guesses.some((current) => current.word === guess.word);
+
+  const addGuess = async (guess: Omit<Guess, "serialNumber">) => {
+    if (doesGuessExist(guess)) {
+      const existingGuess = guesses.find(
+        (currentGuess) => guess.word === currentGuess.word
+      ) as Guess;
+      const orderedGuess = [
+        existingGuess,
+        ...guesses
+          .filter((currentGuess) => existingGuess.word !== currentGuess.word)
+          .sort((guess, otherGuess) => otherGuess.score - guess.score),
+      ];
+      dispatch({ payload: orderedGuess, type: "update" });
+    } else {
+      const newGuess = await postGuess(guess);
+      dispatch({ payload: [newGuess], type: "add" });
+      socket.emit("newGuess", guess);
+    }
   };
 
   return {
