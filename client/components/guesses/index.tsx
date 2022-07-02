@@ -19,16 +19,16 @@ const Guesses: FC = () => {
             const { similarity: score, distance: rank } = await guess(word);
             addGuess({ word, score, rank, owner: user.id, team: user.teamId as string });
           } catch (err) {
-            console.log("Don't that word") // TODO: implement don't know the word
+            console.log("Don't know that word"); // TODO: implement don't know the word
           }
         }}
       />
       <Table
         sx={{
           maxWidth: 600,
-          minWidth: 400,
-          "& .MuiTableCell-head": { fontWeight: "bold", fontSize: 17 },
-          "& .MuiTableCell-body": { fontSize: 17, padding: 0 },
+          minWidth: 300,
+          "& .MuiTableCell-head": { fontWeight: "bold" },
+          "& .MuiTableCell-body": { padding: 0 },
         }}
       >
         <TableHead>

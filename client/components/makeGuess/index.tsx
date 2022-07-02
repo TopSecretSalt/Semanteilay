@@ -17,9 +17,14 @@ const MakeGuess: FC<Props> = ({ handleGuess: handleCreate }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <TextField variant="standard" {...bind} label="make your guess" sx={{ margin: 1 }} />
-      <Button variant="contained" type="submit" sx={{ width: "20ch" }}>
-        <b>Guess</b>
+      <TextField
+        variant="standard"
+        {...bind}
+        label="make your guess"
+        sx={{ margin: 1, direction: "rtl" }}
+      />
+      <Button variant="contained" type="submit" sx={{ width: "15ch" }}>
+        <b>guess</b>
       </Button>
     </form>
   );

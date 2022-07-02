@@ -3,14 +3,19 @@ import styles from "./rooms.module.css";
 import { useRouter } from "next/router";
 import { useRooms } from "../../hooks/useRooms";
 import Skeleton from "react-loading-skeleton";
+import Typography from "@mui/material/Typography";
 
 const Rooms: FC = () => {
   const router = useRouter();
-  const {rooms, isError, isLoading} = useRooms();
-  
-  // TODO: add isEror isLoading and skeleton
-  if (isError || isLoading) return <h1><Skeleton circle/></h1>
+  const { rooms, isError, isLoading } = useRooms();
 
+  // TODO: add isEror isLoading and skeleton
+  if (isError || isLoading)
+    return (
+      <h1>
+        <Skeleton circle />
+      </h1>
+    );
 
   const enterRoom =
     ({ id, name }: { id: string; name: string }) =>
@@ -19,7 +24,7 @@ const Rooms: FC = () => {
         {
           pathname: "/room",
           query: { id },
-        },
+        }
         // `/room/${name.replaceAll(" ", "-")}`
       );
     };
@@ -29,7 +34,7 @@ const Rooms: FC = () => {
       {rooms.map(({ id, name }) => {
         return (
           <div key={id} className={styles.card} onClick={enterRoom({ id, name })}>
-            <h2>{name}</h2>
+            <Typography variant="h2">{name}</Typography>
           </div>
         );
       })}
