@@ -13,7 +13,7 @@ export type Team = {
 export type Room = {
   id: string;
   name: string;
-  teams: User[];
+  teams: Team[];
   participantCount?: number;
 };
 
