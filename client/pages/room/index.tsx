@@ -5,15 +5,17 @@ import Skeleton from "react-loading-skeleton";
 import TeamName from "../../components/teamName";
 import useTeam from "../../hooks/useTeam";
 import Guesses from "../../components/guesses";
-import IconButton from "@mui/material/IconButton/IconButton";
+import IconButton from "@mui/material/IconButton";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Typography from "@mui/material/Typography";
+import Teams from "../../components/teams";
 
 const Room: FC = () => {
   const router = useRouter();
   const { room, isLoading, isError, updateRoom, leaveRoom } = useRoom(
     (router.query.id as string) ?? "-"
   );
-  const { name, switchTeam, changeTeamName } = useTeam(room, updateRoom);
+  const { name, switchTeam } = useTeam(room, updateRoom);
 
   if (isLoading || isError)
     return (
@@ -21,32 +23,28 @@ const Room: FC = () => {
         <Skeleton />
       </h1>
     );
-  // add proper handling
+  // TODO: add proper handling
 
   return (
     <>
-      <IconButton
-        color="secondary"
-        onClick={leaveRoom}
-        sx={{ alignSelf: 'flex-start'}}
-      >
+      <IconButton color="secondary" onClick={leaveRoom} sx={{ alignSelf: "flex-start" }}>
         <ArrowBackIcon />
       </IconButton>
-      <TeamName initialName={name} onChange={changeTeamName} />
-      <h1>
+      <Typography variant="h3">
         <span key={room.participantCount} className="flip-animate">
           {room.name} With <span data-hover={room.participantCount}>{room.participantCount}</span>{" "}
           Players
         </span>
-      </h1>
+      </Typography>
       <hr />
-      {room.teams.map((team) => {
+      <Teams teams={room.teams} />
+      {/* {room.teams.map((team) => {
         return (
-          <h4 key={team.id} onClick={() => switchTeam(team.id)}>
+          <Typography variant="h5" key={team.id} onClick={() => switchTeam(team.id)}>
             {team.name}
-          </h4>
+          </Typography>
         );
-      })}
+      })} */}
       <Guesses />
     </>
   );
